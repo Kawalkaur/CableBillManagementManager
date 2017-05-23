@@ -1,31 +1,34 @@
 package com.kawal.cablebillmanagement;
 
+import java.io.Serializable;
+
 /**
  * Created by kawaldeep on 5/9/2017.
  */
 
-public class UserBean {
+public class UserBean implements Serializable{
     int id;
-    String name;
     String uName;
     String uPhone;
     String uEmail;
     String uPassword;
     String uAddress;
     int UserType;
+    String connectionType;
+
 
     public UserBean() {
     }
 
-    public UserBean(int id, String name, String uName, String uPhone, String uEmail, String uPassword, String uAddress, int userType) {
+    public UserBean(int id, String uName, String uPhone, String uEmail, String uPassword, String uAddress, int userType,String connectionType) {
         this.id = id;
-        this.name = name;
         this.uName = uName;
         this.uPhone = uPhone;
         this.uEmail = uEmail;
         this.uPassword = uPassword;
         this.uAddress = uAddress;
         UserType = userType;
+        this.connectionType = connectionType;
     }
 
     public int getId() {
@@ -34,14 +37,6 @@ public class UserBean {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getuName() {
@@ -92,17 +87,25 @@ public class UserBean {
         UserType = userType;
     }
 
+    public String getConnectionType() {
+        return connectionType;
+    }
+
+    public void setConnectionType(String connectionType) {
+        this.connectionType = connectionType;
+    }
+
     @Override
     public String toString() {
         return "UserBean{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
                 ", uName='" + uName + '\'' +
                 ", uPhone='" + uPhone + '\'' +
                 ", uEmail='" + uEmail + '\'' +
                 ", uPassword='" + uPassword + '\'' +
                 ", uAddress='" + uAddress + '\'' +
                 ", UserType=" + UserType +
+                ", connectiontype='" + connectionType + '\'' +
                 '}';
     }
 }

@@ -5,6 +5,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:fitsSystemWindows="true"
+    android:background="@drawable/images"
     tools:context="com.kawal.cablebillmanagement.ManagerRegistration">
 <LinearLayout
     android:orientation="vertical"
@@ -24,6 +25,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/input_name"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
         android:inputType="textPersonName"
         android:hint="Name"/>
 
@@ -32,6 +35,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/input_mobile"
         android:inputType="phone"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
         android:hint="Mobile Number"
         android:layout_marginTop="10dp"/>
 
@@ -39,6 +44,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/input_email"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
         android:inputType="textEmailAddress"
         android:hint="Email"
         android:layout_marginTop="10dp"/>
@@ -48,6 +55,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/input_password"
         android:inputType="textPassword"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
         android:hint="Password"
         android:layout_marginTop="10dp"/>
 
@@ -55,6 +64,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/input_address"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
         android:inputType="textPostalAddress"
         android:hint="Address"
         android:layout_marginTop="10dp"/>

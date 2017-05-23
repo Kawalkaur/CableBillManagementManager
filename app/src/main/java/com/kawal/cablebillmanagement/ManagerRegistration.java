@@ -1,5 +1,6 @@
 package com.kawal.cablebillmanagement;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,12 +18,14 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+
 
 public class ManagerRegistration extends AppCompatActivity implements View.OnClickListener {
 
@@ -40,9 +43,8 @@ public class ManagerRegistration extends AppCompatActivity implements View.OnCli
     Button _signupButton;
     @InjectView(R.id.link_login)
     TextView _loginLink;
-    ManagerBean bean;
     UserBean uBean;
-
+    ProgressDialog progressDialog;
     RequestQueue requestQueue;
 
     @Override
@@ -75,10 +77,14 @@ public class ManagerRegistration extends AppCompatActivity implements View.OnCli
         }
 
     public void insertIntoCloud() {
+
+       // progressDialog.show();
         StringRequest request = new StringRequest(Request.Method.POST, Util.INSERT_USER_PHP, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.i("TEST",response);
+         //       progressDialog.dismiss();
+
                 Toast.makeText(ManagerRegistration.this, "Success", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(ManagerRegistration.this, ManagerHomeActivity.class);
                 startActivity(intent);
@@ -101,11 +107,20 @@ public class ManagerRegistration extends AppCompatActivity implements View.OnCli
                 map.put("uPassword", uBean.getuPassword());
                 map.put("uAddress", uBean.getuAddress());
                 map.put("userType", String.valueOf(uBean.getUserType()));
-
+          
                 return map;
             }
         };
         requestQueue.add(request);
+        clearFields();
+    }
+    void clearFields() {
+        _nameText.setText("");
+        _mobileText.setText("");
+        _emailText.setText("");
+        _passwordText.setText("");
+        _addressText.setText("");
+
     }
 
 }
