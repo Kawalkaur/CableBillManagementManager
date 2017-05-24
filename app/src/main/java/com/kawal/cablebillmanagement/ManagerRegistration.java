@@ -2,6 +2,7 @@ package com.kawal.cablebillmanagement;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +20,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.firebase.iid.FirebaseInstanceId;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,26 +47,61 @@ public class ManagerRegistration extends AppCompatActivity implements View.OnCli
     Button _signupButton;
     @InjectView(R.id.link_login)
     TextView _loginLink;
-    UserBean uBean;
+    UserBean uBean, rcvUser;
     ProgressDialog progressDialog;
+    boolean updateMode;
     RequestQueue requestQueue;
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manager_registration);
         ButterKnife.inject(this);
+        preferences = getSharedPreferences(Util.PREFS_NAME, MODE_PRIVATE);
+        editor = preferences.edit();
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Please wait....");
+        progressDialog.setCancelable(false);
         _signupButton.setOnClickListener(this);
         uBean = new UserBean();
 
-        requestQueue = Volley.newRequestQueue(this);
-    }
+        Intent rcv = getIntent();
+        updateMode = rcv.hasExtra("keyUser");
 
+
+        requestQueue = Volley.newRequestQueue(this);
+        _loginLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ManagerLogin.class);
+                startActivity(intent);
+                finish();
+                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+            }
+        });
+        if (updateMode) {
+            rcvUser = (UserBean) rcv.getSerializableExtra("keyUser");
+            _nameText.setText(rcvUser.getuName());
+            _mobileText.setText(rcvUser.getuPhone());
+            _emailText.setText(rcvUser.getuEmail());
+            _passwordText.setText(rcvUser.getuPassword());
+            _addressText.setText(rcvUser.getuAddress());
+            _signupButton.setText("Update");
+
+        }
+    }
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btn_signup) {
             insertManager();
-        }
+            if (validateFields()){
+                insertIntoCloud();
+            }
+        }else {
+            Toast.makeText(this, "Please insert correct Input", Toast.LENGTH_LONG).show();
+            }
     }
         void insertManager(){
             uBean.setUserType(1);
@@ -73,21 +112,64 @@ public class ManagerRegistration extends AppCompatActivity implements View.OnCli
             uBean.setuAddress(_addressText.getText().toString().trim());
 
 
-            insertIntoCloud();
+           // insertIntoCloud();
         }
 
     public void insertIntoCloud() {
+        Log.i("TEST", uBean.toString());
 
-       // progressDialog.show();
-        StringRequest request = new StringRequest(Request.Method.POST, Util.INSERT_USER_PHP, new Response.Listener<String>() {
+        String url = "";
+        if (!updateMode) {
+            url = Util.INSERT_USER_PHP;
+
+        } else {
+            Log.e("user", rcvUser.toString());
+            url = Util.UPDATE_USER_PHP;
+        }
+       progressDialog.show();
+        StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.i("TEST",response);
-         //       progressDialog.dismiss();
+                progressDialog.show();
 
-                Toast.makeText(ManagerRegistration.this, "Success", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(ManagerRegistration.this, ManagerHomeActivity.class);
-                startActivity(intent);
+//                Toast.makeText(ManagerRegistration.this, "Success", Toast.LENGTH_LONG).show();
+//                Intent intent = new Intent(ManagerRegistration.this, ManagerHomeActivity.class);
+//                startActivity(intent);
+
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+
+                    int success = jsonObject.getInt("success");
+                    String message = jsonObject.getString("message");
+
+                    if (success == 1) {
+                        Toast.makeText(ManagerRegistration.this, message, Toast.LENGTH_SHORT).show();
+
+                        if (!updateMode) {
+                            editor.putString(Util.KEY_NAME, uBean.getuName());
+                            editor.putString(Util.KEY_PHONE, uBean.getuPhone());
+                            editor.putString(Util.KEY_EMAIL, uBean.getuEmail());
+                            editor.putString(Util.KEY_PASSWORD, uBean.getuPassword());
+                            editor.putString(Util.KEY_ADDRESS, uBean.getuAddress());
+
+                            editor.commit();
+
+                            Intent home = new Intent(ManagerRegistration.this, ManagerHomeActivity.class);
+                            startActivity(home);
+                            finish();
+                        }
+                        if (updateMode)
+                            finish();
+                    } else {
+                        Toast.makeText(ManagerRegistration.this, message, Toast.LENGTH_SHORT).show();
+                    }
+                    progressDialog.dismiss();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(ManagerRegistration.this, "Some Exception", Toast.LENGTH_SHORT).show();
+                }
+
             }
 
 
@@ -100,7 +182,8 @@ public class ManagerRegistration extends AppCompatActivity implements View.OnCli
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> map = new HashMap<String, String>();
-
+                if (updateMode)
+                    map.put("id", String.valueOf(rcvUser.getId()));
                 map.put("uName", uBean.getuName());
                 map.put("uPhone", uBean.getuPhone());
                 map.put("uEmail", uBean.getuEmail());
@@ -113,6 +196,55 @@ public class ManagerRegistration extends AppCompatActivity implements View.OnCli
         };
         requestQueue.add(request);
         clearFields();
+    }
+    boolean validateFields() {
+        boolean flag = true;
+
+
+        if (uBean.getuName().isEmpty()) {
+            _nameText.setError("Please Enter Name");
+            flag = false;
+        }
+        if (uBean.getuPhone().isEmpty()) {
+
+
+            _mobileText.setError("Please Enter Phone");
+            flag = false;
+        }
+        if (uBean.getuPhone().length() < 10) {
+
+
+            _mobileText.setError("Please Enter 10 digits phone number");
+            flag = false;
+        }
+
+
+        if (uBean.getuEmail().isEmpty()) {
+
+            _emailText.setError("Please Enter Email");
+            flag = false;
+        }
+        if (!uBean.getuEmail().contains("@") && uBean.getuEmail().contains(".")) {
+
+
+            _emailText.setError("Please Enter Correct Email");
+            flag = false;
+
+        }
+        if (uBean.getuPassword().isEmpty()) {
+
+            _passwordText.setError("Please Enter Password");
+            flag = false;
+        }
+
+
+        if (uBean.getuAddress().isEmpty()) {
+
+            _addressText.setError("Please Enter Address");
+            flag = false;
+        }
+
+        return flag;
     }
     void clearFields() {
         _nameText.setText("");

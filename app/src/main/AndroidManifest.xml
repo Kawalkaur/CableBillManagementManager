@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ManagerRegistration"
+            android:name=".SplashActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -21,6 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".ManagerHomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,10 +29,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ManagerLogin"/>
+        <activity android:name=".ManagerRegistration"/>
         <activity android:name=".AllCustomers" />
         <activity android:name=".BillingProcess" />
-        <activity android:name=".EmailActivity"></activity>
-
+        <!--<activity android:name=".EmailActivity" />-->
 
     </application>
 

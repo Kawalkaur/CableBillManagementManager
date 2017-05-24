@@ -15,6 +15,8 @@ public class UserBean implements Serializable{
     String uAddress;
     int UserType;
     String connectionType;
+    int status;
+
 
 
     public UserBean() {
@@ -30,7 +32,17 @@ public class UserBean implements Serializable{
         UserType = userType;
         this.connectionType = connectionType;
     }
-
+    public UserBean(int id, String uName, String uPhone, String uEmail, String uPassword, String uAddress, int userType,String connectionType,int status) {
+        this.id = id;
+        this.uName = uName;
+        this.uPhone = uPhone;
+        this.uEmail = uEmail;
+        this.uPassword = uPassword;
+        this.uAddress = uAddress;
+        UserType = userType;
+        this.connectionType = connectionType;
+        this.status = status;
+    }
     public int getId() {
         return id;
     }
@@ -93,6 +105,14 @@ public class UserBean implements Serializable{
 
     public void setConnectionType(String connectionType) {
         this.connectionType = connectionType;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     @Override
